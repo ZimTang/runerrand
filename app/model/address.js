@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 const { db } = require("../../core/db");
+const { Order } = require("./order");
 
 class Address extends Model {
   /**
@@ -54,7 +55,17 @@ class Address extends Model {
       },
     });
     if (!address) throw new global.errs.NotFound();
-    address.destroy();
+    // 判断订单中是否存在该地址
+    const isExist = await Order.findOne({
+      where: {
+        id: address.getDataValue("id"),
+      },
+    });
+    if (!isExist) {
+      address.destroy();
+    } else {
+      throw new global.errs.DeleteError();
+    }
   }
 }
 
@@ -76,6 +87,10 @@ Address.init(
     tableName: "address",
   }
 );
+
+Address.hasMany(Order,{
+  foreignKey: "address_id",
+})
 
 module.exports = {
   Address,

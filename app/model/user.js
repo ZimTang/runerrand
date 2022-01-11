@@ -17,7 +17,7 @@ class User extends Model {
       },
       attributes: ["id"],
     });
-    if (!user.getDataValue("id")) {
+    if (!user) {
       throw new global.errs.NotFound();
     }
     return user.getDataValue("id");
@@ -47,7 +47,7 @@ class User extends Model {
         openid,
       },
     });
-    if (user_id) throw new global.errs.RepeatException("该数据已存在");
+    if (user_id) return;
     User.create({ ...userInfo, openid });
   }
 }
@@ -59,16 +59,14 @@ User.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    nickName: {
-      type: DataTypes.STRING,
-    },
+    nick_name: DataTypes.STRING,
     gender: DataTypes.INTEGER,
     city: DataTypes.STRING,
     province: DataTypes.STRING,
     country: DataTypes.STRING,
     is_helper: {
       type: DataTypes.BOOLEAN,
-      defaultValue: 0,
+      defaultValue: false,
     },
     avatarUrl: {
       type: DataTypes.STRING,
@@ -90,13 +88,12 @@ User.hasOne(Address, {
 
 // order 与 user 表关联
 User.hasMany(User_Order, {
-  foreignKey:"user_id",
+  foreignKey: "user_id",
 });
 
-User_Order.belongsTo(User,{
-  foreignKey:"user_id",
-})
-
+User_Order.belongsTo(User, {
+  foreignKey: "user_id",
+});
 
 module.exports = {
   User,

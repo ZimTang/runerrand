@@ -67,12 +67,22 @@ class AuthFailed extends HttpException {
   }
 }
 
-// 点赞业务错误
-class LikeError extends HttpException {
+// 删除失败
+class DeleteError extends HttpException {
   constructor(msg, errorCode) {
     super()
-    this.msg = msg || '你已经点过赞了'
+    this.msg = msg || '删除失败'
     this.errorCode = errorCode || 60001
+    this.code = 400
+  }
+}
+
+// 接单错误
+class AcceptError extends HttpException {
+  constructor(msg, errorCode) {
+    super()
+    this.msg = msg || '接单失败'
+    this.errorCode = errorCode || 50001
     this.code = 400
   }
 }
@@ -94,6 +104,7 @@ module.exports = {
   NotFound,
   AuthFailed,
   Forbidden,
-  LikeError,
+  DeleteError,
+  AcceptError,
   DisLikeError,
 }

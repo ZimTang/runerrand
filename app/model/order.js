@@ -1,8 +1,7 @@
 // 订单表
 const { DataTypes, Model } = require("sequelize");
 const { db } = require("../../core/db");
-const { ParcelAddress } = require("../model/parcel-address");
-const { Address } = require("./address");
+const { ParcelAddress } = require("./parcelAddress");
 const { User_Order } = require("./user_order");
 
 class Order extends Model {
@@ -17,43 +16,66 @@ class Order extends Model {
   }
 
   /**
-   * 根据openid获取我的订单列表
+   * 根据user_id获取我的订单列表
    * @param {Number} openid openid
    * @returns 订单列表
    */
-  static async getOrderByOpenid(user_id) {
-    const orderList = await Order.findAll({
+  static async getOrderByOpenid(user_id, page, pageSize) {
+    const orderIdList = await User_Order.findAll({
       where: {
         user_id,
       },
+      attributes: ["order_id"],
+      // 分页
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
     });
+    const orderList = [];
+    for (let i = 0; i < orderIdList.length; i++) {
+      orderList.push(
+        await Order.findOne({
+          where: {
+            id: orderIdList[i].getDataValue("order_id"),
+          },
+        })
+      );
+    }
     /* 
       todo: 
           1.查出来的是helper的id 而不是用户名
           2.address和parcel_address查出来的都是id
-          3.未做分页
     */
-
     return orderList;
   }
 
   /**
-   * 获取未完成的订单表
-   * @returns 未完成的订单表
+   * 根据状态获取订单列表
+   * @param {Number} page 分页页码
+   * @param {Number} pageSize 单页数量
+   * @returns 符合状态的订单表
    */
-  static async getUnfinishedOrder() {
-    const unfinishedOrderList = await Order.findAll({
+  static async getOrderListByState(state, page, pageSize) {
+    return await Order.findAll({
       where: {
-        isFinish: false,
+        state: state,
+      },
+      // 分页
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
+  }
+
+  /**
+   * 根据订单id获取订单
+   * @param {Number} id 订单id
+   * @returns 订单
+   */
+  static async getOrderByid(id) {
+    return await Order.findOne({
+      where: {
+        id,
       },
     });
-    /* 
-      todo: 
-          1.查出来的是helper的id 而不是用户名
-          2.address和parcel_address查出来的都是id
-          3.未做分页
-    */
-    return unfinishedOrderList;
   }
 }
 
@@ -84,10 +106,11 @@ Order.init(
     money: DataTypes.INTEGER,
     // 分类
     category: DataTypes.STRING,
-    // 是否完成
-    isFinish: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+    /* 
+      接单状态 0为未接单 1为已接单但未完成 2为已完成
+    */
+    state: {
+      type: DataTypes.INTEGER,
     },
   },
   {
@@ -95,11 +118,10 @@ Order.init(
     tableName: "order",
   }
 );
-
 // 快递地址
-Order.belongsTo(ParcelAddress);
-// 收件地址
-Order.belongsTo(Address);
+Order.belongsTo(ParcelAddress,{
+  foreignKey:"parcel_address_id"
+});
 
 // order 与 user 表关联
 Order.hasMany(User_Order, {

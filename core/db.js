@@ -27,8 +27,8 @@ const sequelize = new Sequelize(dbName, user, password, {
 });
 
 sequelize.sync({
-  force: true,
-  // alter: true,
+  force: false,
+  alter: true,
 });
 
 Model.prototype.toJSON = function () {

@@ -16,7 +16,7 @@ class Category extends Model {
         name,
       },
     });
-    if (!category.dataValues.id) throw new global.errs.NotFound();
+    if (!category) throw new global.errs.NotFound("分类未找到");
     return category.dataValues.id;
   }
 }

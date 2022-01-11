@@ -10,7 +10,7 @@ const router = new Router({
 });
 
 // 用户授权，及插入用户数据
-router.post("/", async (ctx) => {
+router.post("/token", async (ctx) => {
   // 获取code与用户信息
   let {
     code,
@@ -19,7 +19,6 @@ router.post("/", async (ctx) => {
     city,
     province,
     country,
-    is_helper,
     avatarUrl,
   } = ctx.request.body;
   const userInfo = {
@@ -28,9 +27,9 @@ router.post("/", async (ctx) => {
     city,
     province,
     country,
-    is_helper,
     avartar_url: avatarUrl,
   };
+  console.log(userInfo);
   let session_key, openid;
   // 向微信发起请求 获取openid
   let res = await axios.get(
@@ -53,23 +52,15 @@ router.post("/upload", upload.single("file"), async (ctx) => {
 
 // 更新用户信息
 router.post("/update", async (ctx) => {
-  let {
-    nickName,
-    gender,
-    city,
-    province,
-    country,
-    is_helper,
-    avatarUrl,
-    openid,
-  } = ctx.request.body;
+  const { openid } = ctx.req.headers;
+  let { nickName, gender, city, province, country, avatarUrl } =
+    ctx.request.body;
   const userInfo = {
     nick_name: nickName,
     gender,
     city,
     province,
     country,
-    is_helper,
     avartar_url: avatarUrl,
   };
   await User.getUserByOpenid(openid);
