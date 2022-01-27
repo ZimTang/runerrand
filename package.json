@@ -1,5 +1,5 @@
 {
-  "name": "island_server",
+  "name": "runerrand_server",
   "version": "1.0.0",
   "description": "island's back end server",
   "main": "index.js",
