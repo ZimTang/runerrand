@@ -1,6 +1,4 @@
-# 基于 Koa.js 二次开发的跑腿小程序后台开发
-
-技术栈为 `Koa + Sequelize + Mysql`
+# 基于Koa+Sequelize+Mysql的跑腿小程序后端
 
 目前实现的功能为：
 
