@@ -88,9 +88,9 @@ Address.init(
   }
 );
 
-Address.hasMany(Order,{
+Order.belongsTo(Address, {
   foreignKey: "address_id",
-})
+});
 
 module.exports = {
   Address,

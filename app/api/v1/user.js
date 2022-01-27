@@ -12,15 +12,8 @@ const router = new Router({
 // 用户授权，及插入用户数据
 router.post("/token", async (ctx) => {
   // 获取code与用户信息
-  let {
-    code,
-    nickName,
-    gender,
-    city,
-    province,
-    country,
-    avatarUrl,
-  } = ctx.request.body;
+  let { code, nickName, gender, city, province, country, avatarUrl } =
+    ctx.request.body;
   const userInfo = {
     nick_name: nickName,
     gender,
@@ -29,7 +22,6 @@ router.post("/token", async (ctx) => {
     country,
     avartar_url: avatarUrl,
   };
-  console.log(userInfo);
   let session_key, openid;
   // 向微信发起请求 获取openid
   let res = await axios.get(
@@ -43,6 +35,8 @@ router.post("/token", async (ctx) => {
     openid,
   };
 });
+
+//
 
 // 上传头像
 router.post("/upload", upload.single("file"), async (ctx) => {

@@ -22,7 +22,6 @@ router.post("/create", async (ctx) => {
   const category_id = await Category.getCateIdByName(category);
   const order = await Order.createOrder(user_id, orderInfo, category_id);
   const order_id = order.getDataValue("id");
-  console.log(order_id, user_id);
   await User_Order.create({
     order_id: order_id,
     user_id: user_id,
@@ -71,15 +70,19 @@ router.post("/finished", async (ctx) => {
 // 接单
 router.post("/accept", async (ctx) => {
   const { openid } = ctx.req.headers;
-  // id为订单的id
+  console.log(openid);
+  // id为订单的id;
   const { id } = ctx.request.body;
   const helper_id = await User.getUserByOpenid(openid);
   const user_id = await User_Order.getUserIdByOrderId(id);
   // 如果发起用户和帮助者相同
-  if (helper_id == user_id) throw new global.errs.AcceptError("发起用户和帮助者相同");
-  const order = await Order.getOrderByid(id);
+  if (helper_id == user_id)
+    throw new global.errs.AcceptError("发起用户和帮助者相同");
+  // 获取订单
+  const order = await Order.getOrderById(id);
   // 接单
   await User_Order.accpetOrder(order, helper_id);
+
   ctx.body = new global.errs.Success("接单成功");
 });
 
@@ -96,7 +99,7 @@ router.post("/myhelp", async (ctx) => {
   const helpOrderList = [];
 
   for (let i = 0; i < orderIdList.length; i++) {
-    helpOrderList.push(await Order.getOrderByid(orderIdList[i]));
+    helpOrderList.push(await Order.getOrderById(orderIdList[i]));
   }
 
   // todo：接单人和发起人信息没有查出来

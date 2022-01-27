@@ -1,9 +1,9 @@
 // 订单表
 const { DataTypes, Model } = require("sequelize");
 const { db } = require("../../core/db");
+const { Category } = require("./category");
 const { ParcelAddress } = require("./parcelAddress");
 const { User_Order } = require("./user_order");
-
 class Order extends Model {
   /**
    * 创建订单
@@ -37,6 +37,17 @@ class Order extends Model {
           where: {
             id: orderIdList[i].getDataValue("order_id"),
           },
+          include: [
+            {
+              model: require("./parcelAddress").ParcelAddress,
+            },
+            {
+              model: require("./address").Address,
+            },
+            {
+              model: require("./category").Category,
+            },
+          ],
         })
       );
     }
@@ -59,6 +70,17 @@ class Order extends Model {
       where: {
         state: state,
       },
+      include: [
+        {
+          model: require("./parcelAddress").ParcelAddress,
+        },
+        {
+          model: require("./address").Address,
+        },
+        {
+          model: require("./category").Category,
+        },
+      ],
       // 分页
       limit: pageSize,
       offset: (page - 1) * pageSize,
@@ -70,7 +92,7 @@ class Order extends Model {
    * @param {Number} id 订单id
    * @returns 订单
    */
-  static async getOrderByid(id) {
+  static async getOrderById(id) {
     return await Order.findOne({
       where: {
         id,
@@ -119,8 +141,8 @@ Order.init(
   }
 );
 // 快递地址
-Order.belongsTo(ParcelAddress,{
-  foreignKey:"parcel_address_id"
+Order.belongsTo(ParcelAddress, {
+  foreignKey: "parcel_address_id",
 });
 
 // order 与 user 表关联
@@ -132,6 +154,9 @@ User_Order.belongsTo(Order, {
   foreignKey: "order_id",
 });
 
+Order.belongsTo(Category, {
+  foreignKey: "category_id",
+});
 module.exports = {
   Order,
 };

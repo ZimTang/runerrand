@@ -1,7 +1,6 @@
 // 分类表
 const { DataTypes, Model } = require("sequelize");
 const { db } = require("../../core/db");
-const { Order } = require("./order");
 
 class Category extends Model {
   /**
@@ -37,10 +36,6 @@ Category.init(
     tableName: "category",
   }
 );
-
-Category.hasMany(Order, {
-  foreignKey: "category_id",
-});
 
 module.exports = {
   Category,
